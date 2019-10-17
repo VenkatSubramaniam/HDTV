@@ -12,9 +12,9 @@ def main(delimiter, num_columns, num_rows):
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--delimiter", type=str, dest='delimiter')
-    parser.add_argument("--num_columns", type=int, dest='nc')
-    parser.add_argument("--num_rows", type=int, dest='nr')
+    parser.add_argument("--delimiter", type=str, dest='delimiter', default=",")
+    parser.add_argument("--num_columns", type=int, dest='nc', default=10)
+    parser.add_argument("--num_rows", type=int, dest='nr', default=1000)
     args = vars(parser.parse_args())
     main(args['delimiter'], args['nc'], args['nr'])
 
