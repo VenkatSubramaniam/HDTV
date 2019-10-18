@@ -10,7 +10,10 @@ class TxtParser:
                 "\t",
                 "!",
                 " ",
-                ";"
+                ";",
+                "|",
+                "-",
+
             ]
 
     def __init__():
@@ -18,7 +21,16 @@ class TxtParser:
 
     @staticmethod
     def find_delimiter_distribution(filename):
-        pass
+        for delim in delimiters:
+            # this is lazy adding k,v pairs to a dict because we might want to change it to a real distribution later, but for the moment let's treat the dict like a set. Yes. It's lazy. I'm lazy. 
+            self.distribution[delim] = 0
+        with open(filename, "r") as f:
+            while len(self.distribution) > 1:
+                l = f.readline()
+                for delim in self.distribution:
+                    if not l.contains(delim):
+                        del self.distribution[delim]
+            
 
     def get_delimiter(filename):
         self.find_delimiter_distribution(filename)
