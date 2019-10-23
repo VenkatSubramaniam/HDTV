@@ -4,6 +4,8 @@
 ##Imports 
 import pytest
 
+##Read in some dummy data - 
+
 ##Connecting to postgres:
 def test_pg_connection():
 	parser = ingester(uname="username", pword="password", db="postgres")
