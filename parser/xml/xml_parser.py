@@ -9,6 +9,7 @@ import os
 import operator
 import psycopg2
 import pytest
+import subprocess
 import time
 
 
