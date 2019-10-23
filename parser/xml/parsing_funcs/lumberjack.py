@@ -1,56 +1,51 @@
 #!/usr/bin/env python
 # coding: utf-8
+
+##Imports 
+import subprocess
+import pg_inter
+
 def write_stream():
     """Stream writer for a stream of XML inputs"""
+    ##Currently assuming a stable and balanced schema.
+    
     pass
 
-def write_blocks(x, n, columns=True):
+def write_blocks(tree):
     """Block writer for an XML tree - no dynamic sizing"""
-    # inevitable disaster prevention
-    try:
-        a1 = str(x.attrib['key'])
-        a = a1.translate(str.maketrans({"'":"-"}))
-    except:
-        a = 'nulled'
-    try:
-        b1 = str(x.find('title').text)
-        b = b1.translate(str.maketrans({"'":"-"}))
-    except:
-        b = 'nulled'
-    try:
-        c = int(x.find('year').text)
-    except:
-        c = 'null'   
-    try:
-        d1 = str(x.find('journal').text)
-        d = d.translate(str.maketrans({"'":"-"}))
-    except:
-        d = 'nulled'  
-    try:
-        e1 = str(x.find('booktitle').text)
-        e = e1.translate(str.maketrans({"'":"-"}))
-    except:
-        e = 'nulled'  
+    ##Naive implementation without schema inference
+    #infer_schema()
 
-    if x.tag=='article':
-        with open(f'Script Executables/articles_xml_to_sql{n}.sql', 'a', encoding='utf-8') as f:
-            f.write(f"INSERT INTO Articles (pubkey, title, journal, year) VALUES (\'{a}\', \'{b}\', \'{d}\', {c});\n")
-            f.close()
-    if x.tag=='inproceedings':
-        with open(f'Script Executables/inproceedings_xml_to_sql{n}.sql', 'a', encoding='utf-8') as f:
-            f.write(f"INSERT INTO Inproceedings (pubkey, title, booktitle, year) VALUES (\'{a}\', \'{b}\', \'{e}\', {c});\n")
-            f.close()
-    with open(f'Script Executables/authorships_xml_to_sql{n}.sql', 'a', encoding='utf-8') as f:
-        for auth in x.findall('author')[:]:
-            try:
-                at1 = str(auth.text)
-                at = at1.translate(str.maketrans({"'":"-"})).replace("'","")
-            except:
-                print('malformed author entry')
-                print(f'could not parse at {auth}')
-            f.write(f"INSERT INTO Authorships (pubkey, author) VALUES (\'{a}\', \'{at}\');\n")
-        f.close()
-    return
+    ##If we have the columns specified
+    if x.columns:
+        manager = {x.columns[i]:[] for i in range(len(x.columns))}
+        for event, element in x.tree:
+            for desired in x.columns:
+                manager[desired].append(element.find(desired).text)
+            element.clear() 
+            #test the pg insertion block size optimality here
+            #blocksize=1000
+            #if len(manager[desired])+1%blocksize==0:
+            #for now - default behavior is to accumulate whole file into dictionary    
+            pg_inter.writer_function()    
+            
+    ##Otherwise we take it all        
+    else:
+        # collector = {inferred_schema[i]:[] for i in range(len(inferred_schema))}
+        collector = {}
+        for event, element in x.tree:
+            for child in element:
+                if child.tag in collector:
+                    collector[child.tag].append(child.text)
+                else:
+                    collector[child.tag] = []
+            element.clear()     
+            #test the pg insertion block size optimality here
+            #blocksize=1000
+            #if len(collector[child.tag])+1%blocksize==0:         
+            #for now - default behavior is to accumulate whole file into dictionary
+            pg_inter.writer_function()
+
 
 
 

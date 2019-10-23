@@ -2,14 +2,13 @@
 # coding: utf-8
 
 ##Imports - try to pull off more dependencies by the end:
-from parsing_funcs import multifuncs
+from parsing_funcs import lumberjack, pg_inter
 from lxml import etree
 import multiprocessing
 import os
 import operator
 import psycopg2
 import pytest
-import subprocess
 import time
 
 
@@ -111,6 +110,9 @@ class ingester:
         else:
             return connection
     
+    def schema_infer(self):
+        pass
+    
     #optimally into the helper library, called by below insert functions.
     def insert_into_postgres(self):
         raise NotImplementedError
@@ -129,7 +131,7 @@ class ingester:
         
     def blocked(self):
         x.get_tree()
-        raise NotImplementedError
+        lumberjack.write_blocks(x.tree)
     
     def openmp(self):
         x.get_tree()
