@@ -2,7 +2,7 @@
 # coding: utf-8
 
 ##Imports - try to pull off more dependencies by the end:
-from Helper_Funcs import multifuncs
+from parsing_funcs import multifuncs
 from lxml import etree
 import multiprocessing
 import os
