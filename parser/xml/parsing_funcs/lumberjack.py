@@ -3,7 +3,7 @@
 
 ##Imports 
 from lxml import etree
-import pg_inter
+from parsing_funcs import pg_inter
 import subprocess
 
 def write_stream(x):

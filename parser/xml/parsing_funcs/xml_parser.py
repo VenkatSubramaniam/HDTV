@@ -10,6 +10,7 @@ import os
 import operator
 import psycopg2
 import pytest
+import sys
 import time
 
 
@@ -81,7 +82,9 @@ class ingester:
             
     @unit.setter
     def unit(self, unit):
-        assert type(unit)==str, "primary document must be string" #infer this later (for each set(base element) in the tree, proceed)
+        if unit:
+            #infer this later (for each set(base element) in the tree, proceed)
+            assert type(unit)==str, "primary unit must be string" 
         self._unit = unit
 
     @port.setter
@@ -145,11 +148,12 @@ class ingester:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--file", type=str, dest="fname", help="Name of file to be parsed")
-    parser.add_argument("-c", "columns", type=list, dest='cols', default=False, help="List of columns to extract from the file")
+    parser.add_argument("-c", "--columns", type=list, dest='cols', default=False, help="List of columns to extract from the file")
     parser.add_argument("-U", "--username", type=str, dest="uname", default="postgres", help="Username to connect with postgres")
     parser.add_argument("-P", "--password", type=str, dest="pword", default="password", help="Password to connect with postgres")    
-    parser.add_argument("u", "unit", type=str, dest="unit", default=False)
+    parser.add_argument("-D", "--database", type=str, dest="db", default="postgres", help="Database to connect with postgres")
+    parser.add_argument("-u", "--unit", type=str, dest="unit", default=None)
     args = vars(parser.parse_args())
-	parser = ingester(fname=args['fname'], cols=args['cols'], uname=args['uname'], pword=args['pword'], unit=args['unit'])
-    parser.streaming()
-    parser.blocked()
+    parser = ingester(fname=args['fname'], cols=args['cols'], uname=args['uname'], pword=args['pword'], unit=args['unit'], db=args['db'])
+    #    parser.streaming()
+    #    parser.blocked()
