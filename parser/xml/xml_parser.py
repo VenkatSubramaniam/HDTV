@@ -2,6 +2,7 @@
 # coding: utf-8
 
 ##Imports - try to pull off more dependencies by the end:
+import argparse
 from parsing_funcs import lumberjack, pg_inter
 from lxml import etree
 import multiprocessing
@@ -142,6 +143,13 @@ class ingester:
         raise NotImplementedError
 
 if __name__ == "__main__":
-	parser = ingester(fname="dummy.xml", cols="yes", uname="username", pword="password", unit="book")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-f", "--file", type=str, dest="fname", help="Name of file to be parsed")
+    parser.add_argument("-c", "columns", type=list, dest='cols', default=False, help="List of columns to extract from the file")
+    parser.add_argument("-U", "--username", type=str, dest="uname", default="postgres", help="Username to connect with postgres")
+    parser.add_argument("-P", "--password", type=str, dest="pword", default="password", help="Password to connect with postgres")    
+    parser.add_argument("u", "unit", type=str, dest="unit", default=False)
+    args = vars(parser.parse_args())
+	parser = ingester(fname=args['fname'], cols=args['cols'], uname=args['uname'], pword=args['pword'], unit=args['unit'])
     parser.streaming()
     parser.blocked()
