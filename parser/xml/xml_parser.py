@@ -2,7 +2,7 @@
 # coding: utf-8
 
 ##Imports - try to pull off more dependencies by the end:
-from Helper_Funcs import multifuncs
+from parsing_funcs import lumberjack, pg_inter
 from lxml import etree
 import multiprocessing
 import os
@@ -33,7 +33,7 @@ class ingester:
     columns = property(operator.attrgetter('_columns'))
     username = property(operator.attrgetter('_username'))
     password = property(operator.attrgetter('_password'))
-    validation_file = property(operator.attrgetter('_validation_file'))
+    validation_file = property(operator.attrgetter('_validation_file')) #not passing test
     unit = property(operator.attrgetter('_unit'))
     port = property(operator.attrgetter('_port'))
     database = property(operator.attrgetter('_database'))
@@ -51,7 +51,11 @@ class ingester:
         if not c:
             self._columns = False
         else:
-            self._columns = c
+            if type(c)==list:
+                self._columns = c
+            else:
+                self._columns = list(c)
+                assert len(self._columns)==1, "pass a list of names or single string"
 
     @username.setter
     def username(self, u):
@@ -93,6 +97,7 @@ class ingester:
             self._database = db
         
     def validate_login(self):
+        print("Connecting to postgres...")
         connection = psycopg2.connect(
                     dbname=self.database,
                     user=self.username,
@@ -100,36 +105,43 @@ class ingester:
                     port=self.port
                     )
         if connection.closed!=0:
-            print("connection to pg failed")
+            print("connection to postgres failed")
             return False
         else:
             return connection
-
+    
+    def schema_infer(self):
+        pass
+    
+    #optimally into the helper library, called by below insert functions.
+    def insert_into_postgres(self):
+        raise NotImplementedError
+        
     def get_tree(self):
         try:
             self.tree = etree.iterparse(self.filename, tag=self.unit, recover=True, huge_tree=True)
         except:
             pass
 
-    ##For speed testing later, which loads into pgsql the fastest.
-    def linear(self):
-    	##Stream write as looping through the iterator
+    ##for speed testing later, which loads into pgsql the fastest.
+    #optimally, these should be called from the helper library.
+    def streaming(self):
+        x.get_tree()
         raise NotImplementedError
-    
-    def block_linear(self):
-    	##Block write as looping through the iterator
-        raise NotImplementedError   
+        
+    def blocked(self):
+        x.get_tree()
+        lumberjack.write_blocks(x.tree)
     
     def openmp(self):
-    	##Write to file, then write to pgsql
+        x.get_tree()
         raise NotImplementedError
     
     def multiprocessing(self):
-    	##Write to file, then write to pgsql
+        x.get_tree()
         raise NotImplementedError
 
 if __name__ == "__main__":
 	parser = ingester(fname="dummy.xml", cols="yes", uname="username", pword="password", unit="book")
-	# x.validate_login()
-	x.get_tree()
-	#x.multiprocessing
+    parser.streaming()
+    parser.blocked()
