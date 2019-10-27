@@ -3,7 +3,6 @@
 
 ##Imports - try to pull off more dependencies by the end:
 import argparse
-from parsing_funcs import lumberjack, pg_inter
 from lxml import etree
 import multiprocessing
 import os
@@ -12,12 +11,15 @@ import psycopg2
 import pytest
 import sys
 import time
+#Internals
+from parsing_funcs import lumberjack
+from parsing_funcs import pg_inter
 
 
 ## Main ingestion object:
 class ingester:
     """take file and column labels and insert into postgresql"""
-    def __init__(self, fname, cols, uname, pword, validation_file=None, unit=None, port="5432", db=None):
+    def __init__(self, fname, uname, pword, cols=None, validation_file=None, unit=None, port="5432", db=None):
         super(ingester, self).__init__()
         self.filename = fname #expects a path
         self.columns = cols #expects a list of names (str)
@@ -112,7 +114,8 @@ class ingester:
             print("connection to postgres failed")
             return False
         else:
-            return connection
+            self.connection = connection
+            return
     
     def schema_infer(self):
         pass

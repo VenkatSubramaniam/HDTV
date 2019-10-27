@@ -14,9 +14,9 @@ def test_run_cmdline():
 
 ##Connecting to postgres:
 def test_pg_connection():
-	xp.ingester()
-	pass
-	# parser.validate_login()
+	parser = xp.ingester(fname="dummy.xml.test", uname="postgres", pword="password", db="test")
+	parser.validate_login()
+	assert parser.connection.closed==0, "Connection not established"
 
 
 ##No columns specified
