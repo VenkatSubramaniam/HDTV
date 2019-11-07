@@ -3,22 +3,24 @@
 
 ##Imports - try to pull off more dependencies by the end:
 import argparse
+from lxml import etree
 import multiprocessing
 import os
 import operator
+import psycopg2
 import pytest
 import sys
 import time
+#Internals
+from parsing_funcs import lumberjack
+from parsing_funcs import pg_inter
 
-#Calling
-from learner import student
-from parser import ingester
-from db_inter import dbi
 
-class veranda:
-    """Heart of the project. Calls the learner, the parser, and the db interface. UI possibly in future"""
+## Main ingestion object:
+class ingester:
+    """take file and column labels and insert into postgresql"""
     def __init__(self, fname, uname, pword, cols=None, validation_file=None, unit=None, port="5432", db=None):
-        super(veranda, self).__init__()
+        super(ingester, self).__init__()
         self.filename = fname #expects a path
         self.columns = cols #expects a list of names (str)
         self.username = uname #expects a string
@@ -99,22 +101,46 @@ class veranda:
         else:
             assert type(db)==str, "database name must be string"
             self._database = db
+        
+    def validate_login(self):
+        print("Connecting to postgres...")
+        connection = psycopg2.connect(
+                    dbname=self.database,
+                    user=self.username,
+                    password=self.password,
+                    port=self.port
+                    )
+        if connection.closed!=0:
+            print("connection to postgres failed")
+            return False
+        else:
+            self.connection = connection
+            return
+    
+    #optimally into the helper library, called by below insert functions.
+    def insert_into_postgres(self):
+        raise NotImplementedError
+        
+    def get_tree(self):
+        try:
+            self.tree = etree.iterparse(self.filename, tag=self.unit, recover=True, huge_tree=True)
+        except:
+            pass
 
-
-
-
-
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-f", "--file", type=str, dest="fname", help="Name of file to be parsed")
-    parser.add_argument("-c", "--columns", type=list, dest='cols', default=False, help="List of columns to extract from the file")
-    parser.add_argument("-U", "--username", type=str, dest="uname", default="postgres", help="Username to connect with postgres")
-    parser.add_argument("-P", "--password", type=str, dest="pword", default="password", help="Password to connect with postgres")    
-    parser.add_argument("-D", "--database", type=str, dest="db", default="postgres", help="Database to connect with postgres")
-    parser.add_argument("-u", "--unit", type=str, dest="unit", default=None)
-    args = vars(parser.parse_args())
-    parser = ingester(fname=args['fname'], cols=args['cols'], uname=args['uname'], pword=args['pword'], unit=args['unit'], db=args['db'])
-    #    parser.streaming()
-    #    parser.blocked()
+    ##for speed testing later, which loads into pgsql the fastest.
+    #optimally, these should be called from the helper library.
+    def streaming(self):
+        x.get_tree()
+        raise NotImplementedError
+        
+    def blocked(self):
+        x.get_tree()
+        lumberjack.write_blocks(x.tree)
+    
+    def openmp(self):
+        x.get_tree()
+        raise NotImplementedError
+    
+    def multiprocessing(self):
+        x.get_tree()
+        raise NotImplementedError
