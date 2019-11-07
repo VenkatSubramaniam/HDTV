@@ -22,10 +22,9 @@ import psycopg2
 #         f.close()
 #     return
 
-def pg_streamer(query, connection):
+def pg_streamer(query, cursor):
     """Streams input from the xml parser"""
 
-    cursor = connection.cursor()
     cursor.execute(query)
     connection.commit() #does removing the commit change the run-time?
     return
@@ -41,7 +40,7 @@ def pg_connector(x):
 	except (Exception, psycopg2.Error) as error:
 		print(error)
 		return None
-	return connection
+	return connection.cursor()
 
 def pg_disconnector(connection):
 	if(connection):
