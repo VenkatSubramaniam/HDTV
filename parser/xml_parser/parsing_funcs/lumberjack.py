@@ -11,29 +11,60 @@ def write_stream(x):
 
     ##Get the postgres connector:
     connection = pg_inter.pg_connector(x)
-    counter = 0
 
-    ##Currently assuming a stable and balanced schema.
-    for event, element in x.tree:
-        query = []
-        for child in element:
-            query.append(child.tag)
-            try:
-                query.append(child.text)
-            except:
-                query.append('')
-        element.clear()
-        try: 
-            pg_inter.pg_streamer(\
-                query = f"INSERT INTO table {tuple(query[i] for i in range(len(query)) if i%2==0)} VALUES {tuple(query[i] for i in range(len(query)) if i%2==1)}",
-                connection = connection
-                )
-        except Exception as err:
-            print(err)
-        finally:
-            counter+=1
-    pg_inter.pg_disconnector(connection)
-    print(f"Streamed through {counter} rows.")
+    ##To be able to handle repeated attributes, take in array from learner:
+    repeat_array = x.repeats #Learner passes a dict of COLNAME, Bool(Repeat_Elements)
+
+    #How many passed?
+    counter = 0 
+
+    #If we have any repeated rows, create a serial uid and check for repeat cols
+    if any(repeat_array.values())>0:
+        uuid = 0
+    
+        for event, element in x.tree:
+            query = {}
+            query['uuid'] = uuid
+            for child in element:
+                if repeat_array[child.tag]==1:
+                    #We write a separate table insert.
+                    query_extra = {
+                        'uuid': uuid
+                    }
+                    try:
+                        query_extra[child.tag] = child.text
+                    except:
+                        query_extra[child.tag] = ''
+                    x.db_inter.insert_row(table_name_+child.tag, query_extra) #fix table naming!!!
+                else:
+                    #We go with the regular.
+                    try:
+                        query[child.tag] = child.text
+                    except:
+                        query[child.tag] = ''
+                    x.db_inter.insert_row(table_name, query)
+            element.clear()
+            uuid += 1
+            counter += 1
+            if counter == n:
+                x.db_inter.commit()
+                counter = 0
+    else:
+        #We proceed as normal - structured variety
+        for event, element in x.tree:
+            query = {}
+
+            for child in element:
+                try:
+                    query[child.tag] = child.text
+                except:
+                    query[child.tag] = ''
+            element.clear()
+            x.db_inter.insert_row(table_name, query)
+            counter += 1
+            if counter == n:
+                x.db_inter.commit()
+                counter = 0
 
 def write_blocks(x):
     """Block writer for an XML tree - no dynamic sizing"""
@@ -78,5 +109,6 @@ def write_blocks(x):
             pg_inter.writer_function()
 
 
-
+##TO-DO
+#COPY TO DATABASE
 
