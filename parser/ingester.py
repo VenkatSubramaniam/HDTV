@@ -21,13 +21,15 @@ from parser.xml_parser import lumberjack
 ## Main ingestion object:
 class ingester:
     """take file and column labels and insert into postgresql"""
-    def __init__(self, fname, interface=None, cols=None, unit=None, validation_file=None):
+    def __init__(self, fname, interface=None, cols=None, unit=None, validation_file=None, repeats={"keys":False}):
         super(ingester, self).__init__()
         self.interface = interface #expects the interface object
         self.filename = fname #expects a path
         self.columns = cols #expects a list of names (str)
         self.validation_file = validation_file #expects some DTD
-        self.tree = None
+        self.repeats = repeats
+        # self.tree = None
+        lumberjack.write_stream(self)
         #encoding specification from learner
         #host specification
         

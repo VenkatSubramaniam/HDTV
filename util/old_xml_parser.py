@@ -3,18 +3,20 @@
 
 ##Imports 
 from lxml import etree
+from parsing_funcs import pg_inter
 import subprocess
 
 def write_stream(x):
     """Stream writer for a stream of XML inputs"""
 
-    ##To be able to handle repeated attributes, take in array from learner:
-    repeat_dict = x.repeats #Learner passes a dict of COLNAME, Bool(Repeat_Elements)
+    ##Get the postgres connector:
+    connection = pg_inter.pg_connector(x)
 
-    #How many passed before commit?
+    ##To be able to handle repeated attributes, take in array from learner:
+    repeat_array = x.repeats #Learner passes a dict of COLNAME, Bool(Repeat_Elements)
+
+    #How many passed?
     counter = 0 
-    #Commit variable:
-    n = 0
 
     #If we have any repeated rows, create a serial uid and check for repeat cols
     if any(repeat_array.values())>0:
