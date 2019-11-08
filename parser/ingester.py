@@ -11,7 +11,7 @@ import psycopg2
 import pytest
 import sys
 import time
-from typing import
+# from typing import
 
 #Internals
 from json_parser import jparser
