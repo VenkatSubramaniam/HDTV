@@ -2,12 +2,9 @@
 # coding: utf-8
 
 ##Imports - try to pull off more dependencies by the end:
-import argparse
-from lxml import etree
 import multiprocessing
 import os
 import operator
-import psycopg2
 import pytest
 import sys
 import time
@@ -21,14 +18,18 @@ from parser.xml_parser import lumberjack
 ## Main ingestion object:
 class Ingester:
     """take file and column labels and insert into postgresql"""
-    def __init__(self, fname, interface=None, cols=None, unit=None, validation_file=None, repeats={"keys":False}):
+    def __init__(self, fname, ftype="xml" interface=None, cols=None, unit=None, validation_file=None, repeats={"keys":False}):
         self.interface = interface #expects the interface object
         self.filename = fname #expects a path
         self.columns = cols #expects a list of names (str)
         self.validation_file = validation_file #expects some DTD
         self.repeats = repeats
         # self.tree = None
-        lumberjack.write_stream(self)
+        self.filetype = ftype
+        if self.filetype=="lxml":
+            lumberjack = Lumberjack(fname=self.fname, interface=self.interface, cols=self.cols, validation_file=self.validation_file, self.repeats)
+            lumberjack.get_tree()
+            lumberjack.write_stream(self)
         #encoding specification from learner
         #host specification
         
