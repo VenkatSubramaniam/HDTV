@@ -19,19 +19,15 @@ class DBInterfacer:
     def commit(self) -> None:
         self.cursor.commit()
     
-    def create_table(self, table_name: str, schema: Dict[str, str]) -> None:
-        self.cursor.execute(f"create table {table_name} ({self._parse_schema(schema)});")
+    def create_table(self, table: str, schema: Dict[str, str]) -> None:
+        self.cursor.execute(f"create table {table} ({self._parse_schema(schema)});")
     
     @staticmethod
     def _parse_schema(schema: Dict[str, str], key: bool=None) -> str:
         if key:
             pass #TODO
         return ", ".join([" ".join(reversed(item)) for item in schema.items()])
-
-
-
-
-
-
-            
-            
+    
+    def insert_row(table:str, row: Dict[str, str]) -> None:
+        keys = row.keys()
+        self.cursor.execute(f"insert into {table} {keys} values ({[row[key] for key in keys]})")
