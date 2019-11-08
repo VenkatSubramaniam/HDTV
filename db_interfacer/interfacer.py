@@ -6,7 +6,6 @@ class DBInterfacer:
 
     def __init__(self) -> None:
         self.connection, self.cursor = self._establish_postgres_connection()
-        
 
     @staticmethod
     def _establish_postgres_connection() -> None:
