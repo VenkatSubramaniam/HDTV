@@ -21,7 +21,7 @@ from xml_parser import lumberjack
 ## Main ingestion object:
 class ingester:
     """take file and column labels and insert into postgresql"""
-    def __init__(self, interface=None, fname, cols=None, unit=None, validation_file=None):
+    def __init__(self, fname, interface=None, cols=None, unit=None, validation_file=None):
         super(ingester, self).__init__()
         self.interface = interface #expects the interface object
         self.filename = fname #expects a path
