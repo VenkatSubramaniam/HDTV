@@ -17,14 +17,14 @@ def write_stream(x):
     n = 0
 
     #If we have any repeated rows, create a serial uid and check for repeat cols
-    if any(repeat_array.values())>0:
+    if any(repeat_dict.values())>0:
         uuid = 0
     
         for event, element in x.tree:
             query = {}
             query['uuid'] = uuid
             for child in element:
-                if repeat_array[child.tag]==1:
+                if repeat_dict[child.tag]==1:
                     #We write a separate table insert.
                     query_extra = {
                         'uuid': uuid

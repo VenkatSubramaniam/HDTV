@@ -12,10 +12,10 @@ import time
 
 #Calling
 from learner import student
-from parser import ingester
-from db_inter import dbi
+from parser.ingester import Ingester as ing
+from db_interfacer.interfacer import DBInterfacer as dbi
 
-class veranda:
+class Veranda:
     """Heart of the project. Calls the learner, the parser, and the db interface. UI possibly in future"""
     def __init__(self, args):
         ##User interface - TODO
@@ -23,13 +23,11 @@ class veranda:
             #Request the desired columns by list
         ##Start each of the services:
         # pword=args['pword'],
-        interface = dbi(uname=args['uname'], db=args['db'], port=args['p'])
+        interface = dbi(uname=args['uname'], db=args['db'], port=args['port'])
 
-        learner = student(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'])
+        # learner = student(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'])
         
-        parser = ingester(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'], validation_file=args['vf'])
-        for argname in kwargs:
-            self.argname = kwargs['argname']
+        parser = ing(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'], validation_file=args['vf'])
 
 
 
@@ -45,8 +43,8 @@ if __name__ == "__main__":
     argparser.add_argument("-U", "--username", type=str, dest="uname", default="postgres", help="Username to connect with database")
     # argparser.add_argument("-P", "--password", type=str, dest="pword", default="password", help="Password to connect with database")    
     argparser.add_argument("-D", "--database", type=str, dest="db", default="postgres", help="Database to connect with database")
-    argparser.add_argument("-p", "--port", type=str, dest="unit", default=None, help="Port to connect with database")
+    argparser.add_argument("-p", "--port", type=str, dest="port", default=None, help="Port to connect with database")
 
-    args = vars(parser.parse_args())
+    args = vars(argparser.parse_args())
 
-    brain = veranda(args=args)
+    brain = Veranda(args=args)
