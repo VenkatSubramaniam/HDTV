@@ -29,7 +29,11 @@ def pg_streamer(query, cursor):
     connection.commit() #does removing the commit change the run-time?
     return
 
-def pg_connector(x):
+def pg_write_row(table, keys, row):
+	self.cursor.execute(f"insert into {table} ({keys}) values {row}")
+
+
+def pg_connector():
 	"""Validates credentials for connecting to postgres"""
 	
 	try:
