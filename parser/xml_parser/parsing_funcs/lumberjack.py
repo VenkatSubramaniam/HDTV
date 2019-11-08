@@ -35,14 +35,14 @@ def write_stream(x):
                         query_extra[child.tag] = child.text
                     except:
                         query_extra[child.tag] = ''
-                    x.db_inter.insert(table_name_+child.tag, query_extra) #fix table naming!!!
+                    x.db_inter.insert_row(table_name_+child.tag, query_extra) #fix table naming!!!
                 else:
                     #We go with the regular.
                     try:
                         query[child.tag] = child.text
                     except:
                         query[child.tag] = ''
-                    x.db_inter.insert(table_name, query)
+                    x.db_inter.insert_row(table_name, query)
             element.clear()
             uuid += 1
             counter += 1
@@ -60,7 +60,7 @@ def write_stream(x):
                 except:
                     query[child.tag] = ''
             element.clear()
-            x.db_inter.insert(table_name, query)
+            x.db_inter.insert_row(table_name, query)
             counter += 1
             if counter == n:
                 x.db_inter.commit()

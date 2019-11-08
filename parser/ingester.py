@@ -11,37 +11,30 @@ import psycopg2
 import pytest
 import sys
 import time
+from typing import
 
 #Internals
-from parsing_funcs import lumberjack
-from parsing_funcs import pg_inter
-
+from json_parser import jparser
+from structured_parser import sparser
+from xml_parser import lumberjack
 
 ## Main ingestion object:
 class ingester:
     """take file and column labels and insert into postgresql"""
-    def __init__(self, interface=None, fname, uname, pword, cols=None, validation_file=None, unit=None, port="5432", db=None):
+    def __init__(self, interface=None, fname, cols=None, unit=None, validation_file=None):
         super(ingester, self).__init__()
+        self.interface = interface #expects the interface object
         self.filename = fname #expects a path
         self.columns = cols #expects a list of names (str)
-        self.username = uname #expects a string
-        self.password = pword #expects a string
         self.validation_file = validation_file #expects some DTD
-        self.unit = unit #expects a string        
-        self.port = port #gives a default string
-        self.database = db #default is to create a new one
         self.tree = None
-        #encoding specification
+        #encoding specification from learner
         #host specification
         
     filename = property(operator.attrgetter('_filename'))
     columns = property(operator.attrgetter('_columns'))
-    username = property(operator.attrgetter('_username'))
-    password = property(operator.attrgetter('_password'))
     validation_file = property(operator.attrgetter('_validation_file')) #not passing test
     unit = property(operator.attrgetter('_unit'))
-    port = property(operator.attrgetter('_port'))
-    database = property(operator.attrgetter('_database'))
     
     @filename.setter
     def filename(self, f):
@@ -89,17 +82,3 @@ class ingester:
             #infer this later (for each set(base element) in the tree, proceed)
             assert type(unit)==str, "primary unit must be string" 
         self._unit = unit
-
-    @port.setter
-    def port(self, pt):
-        pt = str(pt) #if passed int
-        self._port = pt
-
-    @database.setter
-    def database(self, db):
-        if not db:
-            self._database = False
-        else:
-            assert type(db)==str, "database name must be string"
-            self._database = db
-        
