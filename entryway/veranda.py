@@ -17,8 +17,7 @@ from db_inter import dbi
 
 class veranda:
     """Heart of the project. Calls the learner, the parser, and the db interface. UI possibly in future"""
-    def __init__(self, args, *args, **kwargs):
-        super(veranda, self).__init__()
+    def __init__(self, args):
         ##User interface - TODO
             #Request the atomic object by showing head
             #Request the desired columns by list
