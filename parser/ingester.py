@@ -11,6 +11,7 @@ import psycopg2
 import pytest
 import sys
 import time
+
 #Internals
 from parsing_funcs import lumberjack
 from parsing_funcs import pg_inter
@@ -19,7 +20,7 @@ from parsing_funcs import pg_inter
 ## Main ingestion object:
 class ingester:
     """take file and column labels and insert into postgresql"""
-    def __init__(self, fname, uname, pword, cols=None, validation_file=None, unit=None, port="5432", db=None):
+    def __init__(self, interface=None, fname, uname, pword, cols=None, validation_file=None, unit=None, port="5432", db=None):
         super(ingester, self).__init__()
         self.filename = fname #expects a path
         self.columns = cols #expects a list of names (str)
@@ -102,45 +103,3 @@ class ingester:
             assert type(db)==str, "database name must be string"
             self._database = db
         
-    def validate_login(self):
-        print("Connecting to postgres...")
-        connection = psycopg2.connect(
-                    dbname=self.database,
-                    user=self.username,
-                    password=self.password,
-                    port=self.port
-                    )
-        if connection.closed!=0:
-            print("connection to postgres failed")
-            return False
-        else:
-            self.connection = connection
-            return
-    
-    #optimally into the helper library, called by below insert functions.
-    def insert_into_postgres(self):
-        raise NotImplementedError
-        
-    def get_tree(self):
-        try:
-            self.tree = etree.iterparse(self.filename, tag=self.unit, recover=True, huge_tree=True)
-        except:
-            pass
-
-    ##for speed testing later, which loads into pgsql the fastest.
-    #optimally, these should be called from the helper library.
-    def streaming(self):
-        x.get_tree()
-        raise NotImplementedError
-        
-    def blocked(self):
-        x.get_tree()
-        lumberjack.write_blocks(x.tree)
-    
-    def openmp(self):
-        x.get_tree()
-        raise NotImplementedError
-    
-    def multiprocessing(self):
-        x.get_tree()
-        raise NotImplementedError
