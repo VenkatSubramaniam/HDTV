@@ -56,16 +56,6 @@ class ingester:
             else:
                 self._columns = list(c)
                 assert len(self._columns)==1, "pass a list of names or single string"
-
-    @username.setter
-    def username(self, u):
-        assert type(u)==str, "username must be string"
-        self._username = u
-
-    @password.setter
-    def password(self, p):
-        assert type(p)==str, "password must be string"
-        self._password = p
    
     @validation_file.setter
     def validation_file(self, vf):
