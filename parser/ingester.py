@@ -14,9 +14,9 @@ import time
 # from typing import
 
 #Internals
-from json_parser import jparser
-from structured_parser import sparser
-from xml_parser import lumberjack
+#from json_parser import jparser
+#from structured_parser import sparser
+from parser.xml_parser.parsing_funcs import lumberjack
 
 ## Main ingestion object:
 class ingester:
