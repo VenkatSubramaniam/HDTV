@@ -25,9 +25,9 @@ class veranda:
         ##Start each of the services:
         interface = dbi(uname=args['uname'], pword=args['pword'], db=args['db'], port=args['p'])
 
-        learner = student(interface=database, fname=args['fname'], cols=args['cols'], unit=args['unit'])
+        learner = student(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'])
         
-        parser = ingester(interface=database, fname=args['fname'], cols=args['cols'], unit=args['unit'], validation_file=args['vf'])
+        parser = ingester(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'], validation_file=args['vf'])
         for argname in kwargs:
             self.argname = kwargs['argname']
 
