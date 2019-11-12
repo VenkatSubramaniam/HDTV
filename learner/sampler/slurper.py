@@ -14,12 +14,17 @@ from typing import List
 
 class Slurper(object):
     
-    def __init__(self, filename: str, unit: str = None, encoding: str = 'UTF-8') -> None:
+    def __init__(self, filename: str, filetype: str = "txt",unit: str = None, encoding: str = 'UTF-8') -> None:
         self.file = filename
-        self.unit = unit
         self.encoding = check_file_encodings()
-        self.nlines = estimate_line_size()
-        self.sample_size = get_sample_size()
+        
+        if filetype == "txt":
+            self.nlines = estimate_line_size()
+            self.sample_size = get_sample_size()        
+        else:
+            self.unit = unit
+        
+
     
     def check_file_encodings(file: str = None, encoding: str = None) -> str:
         """Ensure that the file can be opened by cycling through common file types."""        
