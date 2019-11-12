@@ -9,6 +9,7 @@ import operator
 import pytest
 import sys
 import time
+from typing import Dict
 
 #Calling
 from learner import student
@@ -17,7 +18,7 @@ from db_interfacer.interfacer import DBInterfacer as dbi
 
 class Veranda:
     """Heart of the project. Calls the learner, the parser, and the db interface. UI possibly in future"""
-    def __init__(self, args):
+    def __init__(self, args: Dict[str,str]) -> None:
         ##User interface - TODO
             #Request the atomic object by showing head
             #Request the desired columns by list

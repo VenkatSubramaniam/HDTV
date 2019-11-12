@@ -4,25 +4,27 @@
 ##Imports 
 from lxml import etree
 import subprocess
+from typing import Dict, List
 
 
 class Lumberjack:
     """docstring for Lumberjack"""
-    def __init__(self, fname, interface=None, cols=None, unit=None, validation_file=None, repeats=None):
+    def __init__(self, fname: str, interface=None: object, cols=None: List, unit=None: List, validation_file=None: str, repeats=None: Dict[str,bool]) -> None:
         self.interface = interface #expects the interface object
         self.filename = fname #expects a path
         self.columns = cols #expects a list of names (str)
+        self.unit = unit #expects a list of main units        
         self.validation_file = validation_file #expects some DTD
         self.repeats = repeats
 
-    def get_tree(self):
+    def get_tree(self) -> None:
             try:
                 self.tree = etree.iterparse(self.filename, tag=self.unit, recover=True, huge_tree=True)
             except:
                 print("Error forming iterparse tree")
                 pass
 
-    def write_stream(self):
+    def write_stream(self) -> None:
         """Stream writer for a stream of XML inputs"""
 
         ##To be able to handle repeated attributes, take in array from learner:
@@ -81,7 +83,7 @@ class Lumberjack:
                     x.db_inter.commit()
                     counter = 0
 
-    def write_blocks(self):
+    def write_blocks(self) -> None:
         """Block writer for an XML tree - no dynamic sizing"""
 
         ##Naive implementation without schema inference
