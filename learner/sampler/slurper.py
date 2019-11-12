@@ -12,15 +12,21 @@ from typing import List
 #Catch encoding errors inside the functions (get filesize)
 #Connect to the API for the rest of the project
 
+##TO DO:
+#Only call this when the file is of more than ~1/3 total available memory size of the computer. (or approaching max of python 2)
+#Ensure this works for unstructured file types - write this for json
+#Connect to the API for the rest of the project
+
 class Slurper(object):
     
-    def __init__(self, filename: str, filetype: str = "txt",unit: str = None, encoding: str = 'UTF-8') -> None:
+    def __init__(self, filename: str, filetype: str = "txt",unit: str = None, encoding: str = 'UTF-8', structured: bool = False) -> None:
         self.filename = filename
         self.encoding = encoding
+        self.structured = structured
         self.check_file_encodings()
         ##Call the filetype analyst
         self.filetype = filename.split(".")[-1]
-        if self.filetype == "txt":
+        if self.structured == True:
             self.nlines = self.estimate_line_size()
             self.sample_size = self.get_sample_size()        
         else:
@@ -29,7 +35,7 @@ class Slurper(object):
 
     
     def check_file_encodings(self, file: str = None, encoding: str = None, cycle_bit: int = 0) -> str:
-        """Ensure that the file can be opened by cycling through common file types."""        
+        """Ensure that the file can be decoded by cycling through common file types."""        
         if not file:
             file = self.filename
         if not encoding:
@@ -57,14 +63,19 @@ class Slurper(object):
                         return codec
                     except:
                         continue
-                print("Your file is of unusual type - can you specify the encoding for us?")
+                print("Your file is an unusual type - can you specify the encoding for us?")
     
-    def estimate_line_size(self, file: str = None, encoding: str = None) -> int:
+    def estimate_line_size(self, file: str = None, encoding: str = None, structured: bool = False) -> int:
         """Estimate the number of lines in the file- requires exactly 62 line reads."""
+        
         if not file:
             file = self.filename
         if not encoding:
-            encoding = self.encoding              
+            encoding = self.encoding
+        if not structured:
+            structured = self.structured
+        assert structured==True, "Line size estimation only works for structured data."
+        
         try:    
             with open(file, encoding = encoding) as f:
                 #chop header
@@ -112,17 +123,20 @@ class Slurper(object):
             
         #Hard coding the critical and std. dev. for now
         X = (1.96 * 0.5 * 0.5)/(error**2)
-        return math.floor(nlines*X / (X + N - 1))
+        return math.floor(nlines*X / (X + nlines - 1))
             
     
-    def pythonic_reservoir(self, file: str = None, encoding: str = None, reservoir_size: int = None) -> List[str]:
+    def pythonic_reservoir(self, file: str = None, encoding: str = None, reservoir_size: int = None, structured: bool = False) -> List[str]:
         """Make a single pass through the file, replacing each value with some probability. This is Knuth's Reservoir Sampling."""
         if not file:
             file = self.filename
         if not reservoir_size:
             reservoir_size = self.sample_size
         if not encoding:
-            encoding = self.encoding              
+            encoding = self.encoding
+        if not structured:
+            structured = self.structured
+        assert structured==True, "Line size estimation only works for structured data."
             
         reservoir = []
         n = reservoir_size - 1
@@ -191,8 +205,8 @@ class Slurper(object):
                 random_sample.append(f.readline().strip())
         return random_sample
     
-    def read_random_xml(self, file: str = None, sample_size: int = None, byte_bite: int = 50, unit: str = None, encoding: str = None) -> List[bytes]:
-        """Randomly point reader through the file, using the brackets as newline. Iterate until full line."""        
+    def read_random_xml(self, file: str = None, sample_size: int = 100, byte_bite: int = 50, unit: str = None, encoding: str = None) -> List[bytes]:
+        """Randomly point reader through the file, using the bracketed unit as newline. Iterate until full line."""        
         if not file:
             file = self.filename
         if not sample_size:
