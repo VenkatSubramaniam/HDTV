@@ -9,63 +9,97 @@ from typing import List
 ##TO DO:
 #Only call this when the file is of more than ~1/3 total available memory size of the computer. (or approaching max of python 2)
 #Ensure this works for unstructured file types - write this for json
-#Catch encoding errors inside the functions (get filesize)
 #Connect to the API for the rest of the project
 
 class Slurper(object):
     
-    def __init__(self, filename: str, unit: str = None, encoding: str = 'UTF-8') -> None:
+    def __init__(self, filename: str, filetype: str = "txt",unit: str = None, encoding: str = 'UTF-8') -> None:
         self.file = filename
-        self.unit = unit
         self.encoding = check_file_encodings()
-        self.nlines = estimate_line_size()
-        self.sample_size = get_sample_size()
+        
+        if filetype == "txt":
+            self.nlines = estimate_line_size()
+            self.sample_size = get_sample_size()        
+        else:
+            self.unit = unit
+        
+
     
-    def check_file_encodings(file: str = None, encoding: str = None) -> str:
+    def check_file_encodings(file: str = None, encoding: str = None, cycle_bit: int = 0) -> str:
         """Ensure that the file can be opened by cycling through common file types."""        
         if not file:
             file = self.filename
         if not encoding:
             encoding = self.encoding            
+        
+        if cycle_bit > 0:
+            common_encodings = ["UTF-8","Latin-1", "UTF-16", "ascii", "cp037", "cp437", "UTF-32"]
+            return common_encodings[cycle_bit]
+            
+        else:
+            try:
+                with open(file, encoding = encoding) as f:
+                    f.seek(10000,0)
+                    f.readline()
+                    f.close()
+                return encoding
+            except:
+                common_encodings = ["Latin-1", "UTF-16", "ascii", "cp037", "cp437", "UTF-32"]
 
-        try:
-            with open(file, encoding = encoding) as f:
-                f.seek(10000,0)
-                f.readline()
-                f.close()
-            return encoding
-        except:
-            common_encodings = ["Latin-1", "UTF-16", "ascii", "cp037", "cp437", "UTF-32"]
-
-            for codec in common_encodings:
-                try:
-                    with open(file, encoding = codec) as f:
-                        f.readline()
-                        f.close()
-                    return codec
-                except:
-                    continue
-            print("Your file is of unusual type - can you specify the encoding for us?")
+                for codec in common_encodings:
+                    try:
+                        with open(file, encoding = codec) as f:
+                            f.readline()
+                            f.close()
+                        return codec
+                    except:
+                        continue
+                print("Your file is of unusual type - can you specify the encoding for us?")
     
-    def estimate_line_size(file: str = None) -> int:
+    def estimate_line_size(file: str = None, encoding: str = None) -> int:
         """Estimate the number of lines in the file- requires exactly 62 line reads."""
         if not file:
             file = self.filename
-            
-        with open(file) as f:
-            #chop header
-            f.readline()
-            line = f.readline()
-            line_length = len(line)
-            f.seek(0,2)
-            eof = f.tell()
-            average_length = 0
-            for sample in range(2,32):
-                f.seek(math.floor(nlines/sample),0)
+        if not encoding:
+            encoding = self.encoding              
+        try:    
+            with open(file, encoding = encoding) as f:
+                #chop header
                 f.readline()
                 line = f.readline()
-                average_length += len(line)
-            f.close()
+                line_length = len(line)
+                f.seek(0,2)
+                eof = f.tell()
+                average_length = 0
+                for sample in range(2,32):
+                    f.seek(math.floor(nlines/sample),0)
+                    f.readline()
+                    line = f.readline()
+                    average_length += len(line)
+                f.close()
+        except:
+            for cycle in range(1,7):
+                new_encoding = self.check_file_encodings(file = file, encoding = None, cycle_bit = cycle)
+                try:
+                    with open(file, encoding = new_encoding) as f:
+                        #chop header
+                        f.readline()
+                        line = f.readline()
+                        line_length = len(line)
+                        f.seek(0,2)
+                        eof = f.tell()
+                        average_length = 0
+                        for sample in range(2,32):
+                            f.seek(math.floor(nlines/sample),0)
+                            f.readline()
+                            line = f.readline()
+                            average_length += len(line)
+                        f.close()
+                    return math.floor(eof/(average_length/30))
+                except:
+                    continue
+            print("Cannot estimate line size using the typical encodings. Is your data semi-structured?")
+            
         return math.floor(eof/(average_length/30))
             
     def get_sample_size(nlines: int = None, confidence: float = 0.95, error: float = 0.05) -> int:
@@ -90,18 +124,35 @@ class Slurper(object):
         reservoir = []
         n = reservoir_size - 1
         counter = 0
-        
-        with open(file, encoding = encoding) as f:
-            for line in f:
-                if counter < reservoir_size:
-                    reservoir.append(line.strip())
-                else:
-                    n += 1
-                    draw = random.randrange(0,n,1)
-                    if draw < reservoir_size:
-                        reservoir[draw] = line
-            f.close()
-        
+        try:
+            with open(file, encoding = encoding) as f:
+                for line in f:
+                    if counter < reservoir_size:
+                        reservoir.append(line.strip())
+                    else:
+                        n += 1
+                        draw = random.randrange(0,n,1)
+                        if draw < reservoir_size:
+                            reservoir[draw] = line
+                f.close()
+        except:
+            for cycle in range(1,7):
+                new_encoding = self.check_file_encodings(file = file, encoding = None, cycle_bit = cycle)
+                try:
+                    with open(file, encoding = new_encoding) as f:
+                        for line in f:
+                            if counter < reservoir_size:
+                                reservoir.append(line.strip())
+                            else:
+                                n += 1
+                                draw = random.randrange(0,n,1)
+                                if draw < reservoir_size:
+                                    reservoir[draw] = line
+                        f.close()
+                    return reservoir
+                except:
+                    continue
+            print("Cannot run reservoir sampling using the typical encodings. Is your data semi-structured?")
         return reservoir
                     
                     
@@ -138,7 +189,7 @@ class Slurper(object):
         return random_sample
     
     def read_random_xml(file: str = None, sample_size: int = None, byte_bite: int = 50, unit: str = None, encoding: str = None) -> List[bytes]:
-        """Randomly point reader through the file, using the \n as a marker for a new record. Iterate until full line."""        
+        """Randomly point reader through the file, using the brackets as newline. Iterate until full line."""        
         if not file:
             file = self.filename
         if not sample_size:
