@@ -54,7 +54,6 @@ class Slurper(object):
                 common_encodings = ["Latin-1", "UTF-16", "ascii", "cp037", "cp437", "UTF-32"]
             
                 for codec in common_encodings:
-                    print(codec)
                     try:
                         with open(file, encoding = codec) as f:
                             f.readline()
