@@ -13,6 +13,7 @@ def xml_slurper():
 	current_directory2 = os.path.split(current_directory)[0]
 	current_directory3 = os.path.split(current_directory2)[0]
 	path_to_file = current_directory3 + "/util/sample_xml.xml"
+	assert os.path.isfile(path_to_file)
 	return s.Slurper(filename = path_to_file, unit = "row")
 
 # She then tries to call the estimate lines to see how many rows she has in her XML
@@ -41,3 +42,26 @@ def test_randomly_sample_xml(xml_slurper):
 	sample = xml_slurper.read_random_xml()
 	assert type(sample) == list
 	assert len(sample) > 0
+
+
+########################################################################################################
+
+@pytest.fixture
+def csv_slurper():
+	'''Initialize the main object with a csv file.'''
+	path_to_current_file = os.path.realpath(__file__)
+	current_directory = os.path.split(path_to_current_file)[0]
+	current_directory2 = os.path.split(current_directory)[0]
+	current_directory3 = os.path.split(current_directory2)[0]
+	path_to_file = current_directory3 + "/util/NC_VR_piece_0.csv"
+	assert os.path.isfile(path_to_file)
+	return s.Slurper(filename = path_to_file, structured = True)
+
+def test_estimate_sample_size_structured(csv_slurper):
+	sample = csv_slurper.estimate_line_size()
+	assert type(sample) == int
+	assert sample >= 1
+
+	size = csv_slurper.get_sample_size(nlines=sample)
+	assert type(size) == int
+	assert size >= 1	

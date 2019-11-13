@@ -31,8 +31,6 @@ class Slurper(object):
             self.sample_size = self.get_sample_size()        
         else:
             self.unit = unit
-        
-
     
     def check_file_encodings(self, file: str = None, encoding: str = None, cycle_bit: int = 0) -> str:
         """Ensure that the file can be decoded by cycling through common file types."""        
@@ -54,8 +52,9 @@ class Slurper(object):
                 return encoding
             except:
                 common_encodings = ["Latin-1", "UTF-16", "ascii", "cp037", "cp437", "UTF-32"]
-
+            
                 for codec in common_encodings:
+                    print(codec)
                     try:
                         with open(file, encoding = codec) as f:
                             f.readline()
@@ -86,12 +85,13 @@ class Slurper(object):
                 eof = f.tell()
                 average_length = 0
                 for sample in range(2,32):
-                    f.seek(math.floor(nlines/sample),0)
+                    f.seek(math.floor(eof/sample),0)
                     f.readline()
                     line = f.readline()
                     average_length += len(line)
                 f.close()
-        except:
+        except Exception as e:
+            print(e)
             for cycle in range(1,7):
                 new_encoding = self.check_file_encodings(file = file, encoding = None, cycle_bit = cycle)
                 try:
@@ -122,7 +122,7 @@ class Slurper(object):
             nlines = self.nlines
             
         #Hard coding the critical and std. dev. for now
-        X = (1.96 * 0.5 * 0.5)/(error**2)
+        X = (2.58 * 0.5 * 0.5)/(error**2)
         return math.floor(nlines*X / (X + nlines - 1))
             
     
