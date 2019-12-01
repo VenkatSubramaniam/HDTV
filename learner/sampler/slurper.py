@@ -119,10 +119,17 @@ class Slurper(object):
         """Returns number of samples needed for a population of nlines, when sampling is done with replacement"""
         if not nlines:
             nlines = self.nlines
-            
-        #Hard coding the critical and std. dev. for now
-        X = (2.58 * 0.5 * 0.5)/(error**2)
-        return math.floor(nlines*X / (X + nlines - 1))
+        criticals = {
+            0.90: 1.645
+            0.95: 1.96
+            0.99: 2.576
+            90: 1.645
+            95: 1.96
+            99: 2.576            
+        }    
+        #Hard coding the std. dev. of bernoulli for now
+        X = ((criticals[confidence]**2) * 0.5 * 0.5)/(error**2)
+        return math.ceil(nlines*X / (X + nlines - 1)) #sample proportion correction
             
     
     def pythonic_reservoir(self, file: str = None, encoding: str = None, reservoir_size: int = None, structured: bool = False) -> List[str]:

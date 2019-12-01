@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-##Imports - try to pull off more dependencies by the end:
+##Imports
 import argparse
 import multiprocessing
 import os
@@ -16,13 +16,17 @@ from learner.analyze_txt import TxtParser as tp
 from parsers.ingester import Ingester as ing
 
 class Veranda:
-    """Heart of the project. Calls the learner, the parser, and the db interface. UI possibly in future"""
+    """Head of the project. Calls the learner, the parser, and the db interface. UI possibly in future"""
     def __init__(self, args):
         ##User interface - TODO
             #Request the atomic object by showing head
-            #Request the desired columns by list
-        ##Start each of the services:
+            #Request the desired columns by listing
+        ##Start each of the services 
+        ##TO-DO as processes:
+        #Serial
         interface = dbi(uname=args['uname'], pword=args['pword'], db=args['db'], port=args['port'])
+        delimiter = tp(fname=args['fname'])
+        print(delimiter.get_delimiter())
 
         # learner = student(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'])
         parser = ing(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'], validation_file=args['vf'])
