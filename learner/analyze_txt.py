@@ -47,14 +47,14 @@ class TxtParser:
 
     def get_delimiter(self) -> str:
         if "xml" in self.filename.split(".")[-1]:
-                return self.XML_IDENTIFIER
+                return self.XML_IDENTIFIER, True
         if "json" in self.filename.split(".")[-1]:
-            return self.JSON_IDENTIFIER
+            return self.JSON_IDENTIFIER, True
 
         self.find_delimiter_distribution(filename=self.filename)
         if not self.distribution:
             print("Filetype is unstructured")
-        return max(self.distribution.items(), key=operator.itemgetter(1))[0]               
+        return max(self.distribution.items(), key=operator.itemgetter(1))[0], False               
 
     def identify_filetype(self) -> str:
         extension = filename.split(".")[1]

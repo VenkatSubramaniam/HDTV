@@ -25,7 +25,7 @@ class Slurper(object):
         self.structured = structured
         self.check_file_encodings()
         ##Call the filetype analyst
-        self.filetype = filename.split(".")[-1]
+        self.filetype = filetype
         if self.structured == True:
             self.nlines = self.estimate_line_size()
             self.sample_size = self.get_sample_size()        
@@ -120,12 +120,12 @@ class Slurper(object):
         if not nlines:
             nlines = self.nlines
         criticals = {
-            0.90: 1.645
-            0.95: 1.96
-            0.99: 2.576
-            90: 1.645
-            95: 1.96
-            99: 2.576            
+            0.90: 1.645,
+            0.95: 1.96,
+            0.99: 2.576,
+            90: 1.645,
+            95: 1.96,
+            99: 2.576,            
         }    
         #Hard coding the std. dev. of bernoulli for now
         X = ((criticals[confidence]**2) * 0.5 * 0.5)/(error**2)

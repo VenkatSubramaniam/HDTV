@@ -13,6 +13,7 @@ import time
 #Calling
 from db_interfacer.interfacer import DBInterfacer as dbi
 from learner.analyze_txt import TxtParser as tp
+from learner.sampler.slurper import Slurper as slurp
 from parsers.ingester import Ingester as ing
 
 class Veranda:
@@ -26,8 +27,10 @@ class Veranda:
         #Serial
         interface = dbi(uname=args['uname'], pword=args['pword'], db=args['db'], port=args['port'])
         delimit = tp(fname=args['fname'])
-        delimiter = delimit.get_delimiter()
-
+        delimiter, unstructured = delimit.get_delimiter()
+        
+        sampler = slurp(filename=args['fname'], structured=not unstructured)
+        print(sampler.nlines, sampler.sample_size)
         # learner = student(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'])
         parser = ing(interface=interface, fname=args['fname'], ftype=delimiter, cols=args['cols'], unit=args['unit'], validation_file=args['vf'])
 
