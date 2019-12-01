@@ -8,18 +8,18 @@ import operator
 import pytest
 import sys
 import time
-# from typing import
+from typing import Dict
 
 #Internals
 #from json_parser import jparser
 #from structured_parser import sparser
 
-# from parser.xml_parser import lumberjack
+from parsers.xml_parser import lumberjack
 
 ## Main ingestion object:
 class Ingester:
     """take file and column labels and insert into postgresql"""
-    def __init__(self, fname, ftype="xml", interface=None, cols=None, unit=None, validation_file=None, repeats={"keys":False}):
+    def __init__(self, fname: str=None, ftype: str="xml", interface: object=None, cols: str=None, unit: str=None, validation_file: str=None, repeats: Dict={"keys":False}):
 
         self.interface = interface #expects the interface object
         self.filename = fname #expects a path
