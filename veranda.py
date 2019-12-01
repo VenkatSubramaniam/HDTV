@@ -12,7 +12,7 @@ import time
 
 #Calling
 from learner import student
-from parser.ingester import Ingester as ing
+from .parser.ingester import Ingester as ing
 from db_interfacer.interfacer import DBInterfacer as dbi
 
 class Veranda:
@@ -36,7 +36,7 @@ class Veranda:
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
     argparser.add_argument("-f", "--file", type=str, dest="fname", help="Name of file to be parsed")
-    argparser.add_argument("-c", "--columns", type=list, dest='cols', default=False, help="List of columns to be extracted from the file")
+    argparser.add_argument("-c", "--columns", type=str, nargs='+', dest='cols', default=False, help="List of columns to be extracted from the file")
     argparser.add_argument("-u", "--unit", type=str, dest="unit", default=None, help="Base unit(s) to be extracted from the file")
     argparser.add_argument("-v", "--validation", type=str, dest="vf", help="Name of file to be used in validation")
 
