@@ -12,7 +12,8 @@ import time
 
 #Calling
 from learner import student
-from .parser.ingester import Ingester as ing
+import parsers
+from parsers.ingester import Ingester as ing
 from db_interfacer.interfacer import DBInterfacer as dbi
 
 class Veranda:
@@ -22,26 +23,22 @@ class Veranda:
             #Request the atomic object by showing head
             #Request the desired columns by list
         ##Start each of the services:
-        # pword=args['pword'],
-        interface = dbi(uname=args['uname'], db=args['db'], port=args['port'])
+        interface = dbi(uname=args['uname'], pword=args['pword'], db=args['db'], port=args['port'])
 
         # learner = student(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'])
-        
         parser = ing(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'], validation_file=args['vf'])
 
 
-
-
-
 if __name__ == "__main__":
+    
     argparser = argparse.ArgumentParser()
-    argparser.add_argument("-f", "--file", type=str, dest="fname", help="Name of file to be parsed")
+    argparser.add_argument("-f", "--file", type=str, dest="fname", help="Name of file to be parsed", required=True)
     argparser.add_argument("-c", "--columns", type=str, nargs='+', dest='cols', default=False, help="List of columns to be extracted from the file")
     argparser.add_argument("-u", "--unit", type=str, dest="unit", default=None, help="Base unit(s) to be extracted from the file")
     argparser.add_argument("-v", "--validation", type=str, dest="vf", help="Name of file to be used in validation")
 
     argparser.add_argument("-U", "--username", type=str, dest="uname", default="postgres", help="Username to connect with database")
-    # argparser.add_argument("-P", "--password", type=str, dest="pword", default="password", help="Password to connect with database")    
+    argparser.add_argument("-P", "--password", type=str, dest="pword", default="password", help="Password to connect with database")    
     argparser.add_argument("-D", "--database", type=str, dest="db", default="postgres", help="Database to connect with database")
     argparser.add_argument("-p", "--port", type=str, dest="port", default=None, help="Port to connect with database")
 
