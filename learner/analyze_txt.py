@@ -13,17 +13,17 @@ class TxtParser:
                 ";",
                 "|",
                 "-",
+                ]
 
-            ]
-
-    def __init__():
+    def __init__(self):
         self.distribution = {}
 
     @staticmethod
     def find_delimiter_distribution(filename):
+        # Discrete counts as k,v pairs.
         for delim in delimiters:
-            # this is lazy adding k,v pairs to a dict because we might want to change it to a real distribution later, but for the moment let's treat the dict like a set. Yes. It's lazy. I'm lazy. 
             self.distribution[delim] = 0
+        # Remove one at a time until only one delimiter left.
         with open(filename, "r") as f:
             while len(self.distribution) > 1:
                 l = f.readline()
@@ -36,7 +36,7 @@ class TxtParser:
         self.find_delimiter_distribution(filename)
         if not self.distribution:
             return TxtParser.JSON_IDENTIFIER
-       return max(self.distribution.iteritems(), key=operator.itemgetter(1))[0]               
+        return max(self.distribution.iteritems(), key=operator.itemgetter(1))[0]               
 
     def identify_filetype(filename: str) -> str:
         extension = filename.split(".")[1]

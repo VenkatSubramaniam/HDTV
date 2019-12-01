@@ -11,10 +11,9 @@ import sys
 import time
 
 #Calling
-from learner import student
-import parsers
-from parsers.ingester import Ingester as ing
 from db_interfacer.interfacer import DBInterfacer as dbi
+from learner.analyze_txt import TxtParser as tp
+from parsers.ingester import Ingester as ing
 
 class Veranda:
     """Heart of the project. Calls the learner, the parser, and the db interface. UI possibly in future"""

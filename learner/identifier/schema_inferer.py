@@ -15,7 +15,7 @@ def check_double(List[str]) -> bool:
 def check_small_int(List[str) -> bool:
     pass
 
-def  check_int(List[str]) -> bool:
+def check_int(List[str]) -> bool:
     pass
 
 
