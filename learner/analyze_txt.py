@@ -41,19 +41,20 @@ class TxtParser:
         with open(filename, "r") as f:
             while len(self.distribution) > 1:
                 l = f.readline()
-                for delim in self.distribution[:]:
+                for delim in self.DELIMITERS[:]:
                     if delim not in l:
                         del self.distribution[delim]
 
     def get_delimiter(self) -> str:
+        if "xml" in self.filename.split(".")[-1]:
+                return self.XML_IDENTIFIER
+        if "json" in self.filename.split(".")[-1]:
+            return self.JSON_IDENTIFIER
+
         self.find_delimiter_distribution(filename=self.filename)
         if not self.distribution:
             print("Filetype is unstructured")
-            if "xml" in self.filename.split(".")[-1]:
-                return self.XML_IDENTIFIER
-            else:
-                return self.JSON_IDENTIFIER
-        return max(self.distribution.iteritems(), key=operator.itemgetter(1))[0]               
+        return max(self.distribution.items(), key=operator.itemgetter(1))[0]               
 
     def identify_filetype(self) -> str:
         extension = filename.split(".")[1]

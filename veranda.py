@@ -25,11 +25,11 @@ class Veranda:
         ##TO-DO as processes:
         #Serial
         interface = dbi(uname=args['uname'], pword=args['pword'], db=args['db'], port=args['port'])
-        delimiter = tp(fname=args['fname'])
-        print(delimiter.get_delimiter())
+        delimit = tp(fname=args['fname'])
+        delimiter = delimit.get_delimiter()
 
         # learner = student(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'])
-        parser = ing(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'], validation_file=args['vf'])
+        parser = ing(interface=interface, fname=args['fname'], ftype=delimiter, cols=args['cols'], unit=args['unit'], validation_file=args['vf'])
 
 
 if __name__ == "__main__":
