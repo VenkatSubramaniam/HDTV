@@ -4,13 +4,17 @@
 from typing import Dict, List, Union
 
 class Inferer:
-	'''Object for analyzing a generic text file. Passes result back to head.'''
+	'''Object for extracting a schema from the random rows. Passes result back to head.'''
 	def __init__(self, sample: List, unstructured: bool) -> None:
 		self.sample = sample
 		self.unstructured = unstructured
+		
+
 
 	def infer_schema(type_dict: Dict[Union[str, int], List[str]]) -> Dict[Union[str, int], str]:
-		pass
+		##Two paths: structured and semi-structured:
+		if not unstructured:
+			self.infer_schema()
 
 
 	def check_bool(column: List[str]) -> bool:

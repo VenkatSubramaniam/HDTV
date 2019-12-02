@@ -6,11 +6,10 @@ import argparse
 import multiprocessing
 import os
 import operator
-import pytest
 import sys
 import time
 
-#Calling
+##Calling
 from db_interfacer.interfacer import DBInterfacer as dbi
 from learner.analyze_txt import TxtParser as tp
 from learner.identifier.schema_inferer import Inferer as inf
@@ -25,17 +24,25 @@ class Veranda:
             #Request the desired columns by listing
         ##Start each of the services 
         ##TO-DO as processes:
-        #Serial
+        ##Serial
         interface = dbi(uname=args['uname'], pword=args['pword'], db=args['db'], port=args['port'])
         delimit = tp(fname=args['fname'])
         delimiter, unstructured = delimit.get_delimiter()
         
-        #Get the samples
+        ##Get the samples
         sampler = slurp(filename=args['fname'], structured=not unstructured)
-        rs1 = sampler.read_random_lines()
-        rs2 = sampler.pythonic_reservoir()
+        if unstructured:
+            if delimiter=="xml":
+                rs0 = sampler.read_random_xml()
+            else:
+                #fix for the json sampler
+                pass
+        else:
+            #Skim down to the faster one after testing
+            rs1 = sampler.read_random_lines()
+            rs2 = sampler.pythonic_reservoir()
 
-        #Pass them to the inferer
+        ##Pass them to the inferer
         schema = inf(rs2,unstructured)
 
         # learner = student(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'])
