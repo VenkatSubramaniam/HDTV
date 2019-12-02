@@ -13,6 +13,7 @@ import time
 #Calling
 from db_interfacer.interfacer import DBInterfacer as dbi
 from learner.analyze_txt import TxtParser as tp
+from learner.identifier.schema_inferer import Inferer as inf
 from learner.sampler.slurper import Slurper as slurp
 from parsers.ingester import Ingester as ing
 
@@ -29,9 +30,13 @@ class Veranda:
         delimit = tp(fname=args['fname'])
         delimiter, unstructured = delimit.get_delimiter()
         
+        #Get the samples
         sampler = slurp(filename=args['fname'], structured=not unstructured)
         rs1 = sampler.read_random_lines()
         rs2 = sampler.pythonic_reservoir()
+
+        #Pass them to the inferer
+        schema = inf(rs2,unstructured)
 
         # learner = student(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'])
         parser = ing(interface=interface, fname=args['fname'], ftype=delimiter, cols=args['cols'], unit=args['unit'], validation_file=args['vf'])

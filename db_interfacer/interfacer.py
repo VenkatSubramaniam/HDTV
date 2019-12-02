@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: utf-8
+
 from typing import Dict
 import psycopg2 as pg # kill me this name
 
