@@ -188,24 +188,31 @@ class Slurper(object):
         if not file:
             file = self.filename
         if not sample_size:
-            sample_size = self.sample_size
+            sample_size = self.sample_size 
         
         random_sample = []
         with open(file, 'rb') as f:
+            #Always take the first line for a structured file
+            random_sample.append(f.readline().strip())
+            while True:
+                nxt = f.read(500)
+                eofl = nxt.find(b'\n')
+                if eofl != -1:
+                    break
             for sample in range(sample_size):
                 f.seek(0, 2)
                 size = f.tell()
-                i = random.randrange(0, size)
+                i = random.randrange(eofl, size+1)
                 while True:
                     i -= byte_bite
-                    ##Prevent an improper seek before (0,0).
+                    #Prevent an improper seek before (0,0).
                     if i < 0:
                         byte_bite += i
                         i = 0
                     f.seek(i, 0)
                     nxt = f.read(byte_bite)
                     eol_idx = nxt.rfind(b'\n')
-                    ##If not clean, then jump to the next line by using the \n as a marker.
+                    #If not clean, then jump to the next line by using the \n as a marker.
                     if eol_idx != -1:
                         i += eol_idx + 1
                         break

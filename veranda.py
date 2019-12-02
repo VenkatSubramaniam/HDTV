@@ -43,7 +43,7 @@ class Veranda:
             rs2 = sampler.pythonic_reservoir()
 
         ##Pass them to the inferer
-        schema = inf(rs2,unstructured)
+        schema = inf(rs2, delimiter, unstructured)
 
         # learner = student(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'])
         parser = ing(interface=interface, fname=args['fname'], ftype=delimiter, cols=args['cols'], unit=args['unit'], validation_file=args['vf'])
