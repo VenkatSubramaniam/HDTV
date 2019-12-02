@@ -30,7 +30,9 @@ class Veranda:
         delimiter, unstructured = delimit.get_delimiter()
         
         sampler = slurp(filename=args['fname'], structured=not unstructured)
-        print(sampler.nlines, sampler.sample_size)
+        rs1 = sampler.read_random_lines()
+        rs2 = sampler.pythonic_reservoir()
+
         # learner = student(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'])
         parser = ing(interface=interface, fname=args['fname'], ftype=delimiter, cols=args['cols'], unit=args['unit'], validation_file=args['vf'])
 

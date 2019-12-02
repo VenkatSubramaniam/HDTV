@@ -145,32 +145,33 @@ class Slurper(object):
         assert structured==True, "Line size estimation only works for structured data."
             
         reservoir = []
-        n = reservoir_size - 1
+        #one extra for the header
+        n = reservoir_size + 1 
         counter = 0
         try:
             with open(file, encoding = encoding) as f:
                 for line in f:
-                    if counter < reservoir_size:
+                    if counter < n:
                         reservoir.append(line.strip())
+                        counter += 1
                     else:
-                        n += 1
-                        draw = random.randrange(0,n,1)
-                        if draw < reservoir_size:
-                            reservoir[draw] = line
+                        #skip the first to keep the header in
+                        draw = random.randrange(1,n,1)
+                        reservoir[draw] = line
                 f.close()
         except:
             for cycle in range(1,7):
                 new_encoding = self.check_file_encodings(file = file, encoding = None, cycle_bit = cycle)
                 try:
-                    with open(file, encoding = new_encoding) as f:
+                    with open(file, encoding = encoding) as f:
                         for line in f:
-                            if counter < reservoir_size:
+                            if counter < n:
                                 reservoir.append(line.strip())
+                                counter += 1
                             else:
-                                n += 1
-                                draw = random.randrange(0,n,1)
-                                if draw < reservoir_size:
-                                    reservoir[draw] = line
+                                #skip the first to keep the header in
+                                draw = random.randrange(1,n,1)
+                                reservoir[draw] = line
                         f.close()
                     return reservoir
                 except:
