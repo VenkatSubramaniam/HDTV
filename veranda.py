@@ -28,7 +28,8 @@ class Veranda:
         interface = dbi(uname=args['uname'], pword=args['pword'], db=args['db'], port=args['port'])
         delimit = tp(fname=args['fname'])
         delimiter, unstructured = delimit.get_delimiter()
-        
+        #pick the encoding somewhere here
+
         ##Get the samples
         sampler = slurp(filename=args['fname'], structured=not unstructured)
         if unstructured:
@@ -43,7 +44,8 @@ class Veranda:
             rs2 = sampler.pythonic_reservoir()
 
         ##Pass them to the inferer
-        schema = inf(rs2, delimiter, unstructured)
+        #Time check but assuming the bytes win in speed
+        schema = inf(rs1, delimiter, unstructured)
 
         # learner = student(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'])
         parser = ing(interface=interface, fname=args['fname'], ftype=delimiter, cols=args['cols'], unit=args['unit'], validation_file=args['vf'])
