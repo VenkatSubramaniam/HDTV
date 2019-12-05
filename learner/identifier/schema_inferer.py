@@ -9,7 +9,6 @@ class Inferer:
 	'''Object for extracting a schema from the random rows. Passes result back to head.'''
 	def __init__(self, sample: List, delimiter: str, unstructured: bool, encoding: str="utf-8") -> None:
 		self.type_dict = self._infer_schema(sample, delimiter, unstructured, encoding)
-		print(self.type_dict)
 
 	def _parse_structured_dict(self, sample: List[Union[bytes,str]], delimiter: str, encoding: str) -> Dict[Union[str, int], List[str]]:
 		#Two paths: structured and semi-structured:
@@ -55,7 +54,7 @@ class Inferer:
 		if self.check_int(vals):
 			return "int"
 		if self.check_double(vals):
-			return "double"
+			return "double precision"
 		return "varchar"
 
 	@staticmethod
