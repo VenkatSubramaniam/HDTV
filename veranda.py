@@ -45,7 +45,7 @@ class Veranda:
 
         ##Pass them to the inferer
         #Time check but assuming the bytes win in speed
-        schema = inf(rs1, delimiter, unstructured)
+            schema = inf(rs1, delimiter, unstructured)
 
         # learner = student(interface=interface, fname=args['fname'], cols=args['cols'], unit=args['unit'])
         parser = ing(interface=interface, fname=args['fname'], ftype=delimiter, cols=args['cols'], unit=args['unit'], validation_file=args['vf'])
