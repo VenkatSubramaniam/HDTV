@@ -154,4 +154,5 @@ class Timing_Tests:
 		return self.nrows, self.timing_dictionary
 
 if __name__ == "__main__":
-	Timing_Tests()		
+	Timing_Tests()
+	(Timing_Tests.timing_dictionary)	
