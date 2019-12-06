@@ -17,6 +17,8 @@ from learner.identifier.schema_inferer import Inferer as inf
 from learner.sampler.slurper import Slurper as slurp
 from parsers.ingester import Ingester as ing
 
+import plot_time as pt
+
 
 class Timing_Tests:
 	"""
@@ -24,9 +26,11 @@ class Timing_Tests:
 	Should pass a dictionary of //'phase of project': time// to the graphing function
 	"""
 	def __init__(self):
-		self.phases = ["Sampler", "Estimate Lines", "Sample Lines - Structured v1", "Sample Lines - Structured v2",\
-		"Sample Lines - XML", "Sample Lines - JSON", "Schema Inference", "Parse File",\
-		"Parse Structured", "Parse XML", "Parse JSON", "Pandas"]
+		self.phases = ["Sampler", "Estimate Lines", "Sample Lines - Structured v1",] 
+		# "Sample Lines - Structured v2",]
+		# \
+		# "Sample Lines - XML", "Sample Lines - JSON", "Schema Inference", "Parse File",\
+		# "Parse Structured", "Parse XML", "Parse JSON", "Pandas"]
 		self.nrows = [1e2,5e2,1e3,5e3,2e4,5e4,75e3,1e5,2e5,25e4,3e5,35e4,45e4,5e5,6e5,75e4,1e6,15e5,2e6,5e6,1e7]
 		self.file_map = {key: f"{key}_test.csv" for key in self.nrows}
 		self.timing_dictionary = {key: [] for key in self.phases}
@@ -35,8 +39,9 @@ class Timing_Tests:
 		self.test_sampler()
 		self.test_estimate_lines()
 		self.test_sampling_lines_1()
-		self.test_sampling_lines_2()
-		self.test_schema_inferer()
+		# self.test_sampling_lines_2()
+		# self.test_schema_inferer()
+		# self.test_database_insertion()
 		# self.test_pandas_baseline()
 
 	
@@ -154,5 +159,5 @@ class Timing_Tests:
 		return self.nrows, self.timing_dictionary
 
 if __name__ == "__main__":
-	Timing_Tests()
-	(Timing_Tests.timing_dictionary)	
+	graphs = Timing_Tests()
+	pt.plot_time(graphs.timing_dictionary, graphs.nrows)	
