@@ -23,5 +23,5 @@ def plot_time(runtime, row_number):
         sns.lineplot(x='Number of Rows', y="Runtime", data=df)
         plt.xlabel('Number of rows')
         plt.ylabel('Runtime(s)')
-        plt.title('Runtime versus Filesize on'+ phase)
+        plt.title('Runtime versus Filesize on '+ phase)
         plt.savefig(f"../util/graph_for_{phase}.png")

@@ -26,22 +26,23 @@ class Timing_Tests:
 	Should pass a dictionary of //'phase of project': time// to the graphing function
 	"""
 	def __init__(self):
-		self.phases = ["Sampler", "Estimate Lines", "Sample Lines - Structured v1",] 
-		# "Sample Lines - Structured v2",]
+		self.phases = ["Sampler"]
+		# , "Estimate Lines", "Sample Lines - Structured v1", "Sample Lines - Structured v2", "Schema Inference", "Parse Structured", "Full Project", "Pandas Baseline"]
 		# \
-		# "Sample Lines - XML", "Sample Lines - JSON", "Schema Inference", "Parse File",\
-		# "Parse Structured", "Parse XML", "Parse JSON", "Pandas"]
+		# "Sample Lines - XML", "Sample Lines - JSON", , "Parse File",\
+		# , "Parse XML", "Parse JSON", ]
 		self.nrows = [1e2,5e2,1e3,5e3,2e4,5e4,75e3,1e5,2e5,25e4,3e5,35e4,45e4,5e5,6e5,75e4,1e6,15e5,2e6,5e6,1e7]
 		self.file_map = {key: f"{key}_test.csv" for key in self.nrows}
 		self.timing_dictionary = {key: [] for key in self.phases}
 
 		##Execute
-		self.test_sampler()
+		self.test_sampler() 
 		# self.test_estimate_lines()
 		# self.test_sampling_lines_1()
 		# self.test_sampling_lines_2()
 		# self.test_schema_inferer()
-		# self.test_database_insertion()
+		# self.test_parser()
+		# self.test_full_project()
 		# self.test_pandas_baseline()
 
 	
@@ -59,8 +60,9 @@ class Timing_Tests:
 			for test_iteration in range(30):
 				t0 = timeit.default_timer()
 				sampler = slurp(filename=f"../util/{file_new}", structured=True)
-				sampler.read_random_lines()
+				lines = sampler.read_random_lines()
 				this_n.append(timeit.default_timer()-t0)
+				del sampler, lines
 
 			self.timing_dictionary[self.phases[current_phase]].append(this_n)
 
@@ -77,6 +79,7 @@ class Timing_Tests:
 				t0 = timeit.default_timer()
 				sampler = slurp(filename=f"../util/{file_new}", structured=True)
 				this_n.append(timeit.default_timer()-t0)
+				del sampler
 
 			self.timing_dictionary[self.phases[current_phase]].append(this_n)
 
@@ -94,6 +97,7 @@ class Timing_Tests:
 				t0 = timeit.default_timer()
 				rs1 = sampler.read_random_lines()
 				this_n.append(timeit.default_timer()-t0)
+				del rs1
 
 			self.timing_dictionary[self.phases[current_phase]].append(this_n)	
 
@@ -110,10 +114,11 @@ class Timing_Tests:
 				t0 = timeit.default_timer()
 				rs2 = sampler.pythonic_reservoir()
 				this_n.append(timeit.default_timer()-t0)
+				del rs2
 
 			self.timing_dictionary[self.phases[current_phase]].append(this_n)
 
-	def test_schema_inferer(self, current_phase: int = 7, structured: bool=True) -> None:
+	def test_schema_inferer(self, current_phase: int = 4, structured: bool=True) -> None:
 		##Identifies all parts of the project to be measures and establishes a baseline of 10k rows
 		current_rows = 0
 		for niter in range(len(self.nrows)):
@@ -125,7 +130,48 @@ class Timing_Tests:
 
 			for test_iteration in range(30):
 				t0 = timeit.default_timer()
-				schema = inf(lines, ",", False).type_dict
+				schema = inf(lines, delimiter=",", unstructured=False).type_dict
+				this_n.append(timeit.default_timer()-t0)
+				del schema
+
+			self.timing_dictionary[self.phases[current_phase]].append(this_n)
+
+	def test_parser(self, current_phase: int = 5, structured: bool=True) -> None:
+		##Identifies all parts of the project to be measures and establishes a baseline of 10k rows
+		current_rows = 0
+		for niter in range(len(self.nrows)):
+			this_n = []
+			file_new = self.increase_load(current_rows)
+			current_rows += 1
+			sampler = slurp(filename=f"../util/{file_new}", structured=True)
+			lines = sampler.read_random_lines()
+			schema = inf(lines, delimiter=",", unstructured=False).type_dict
+			interface.create_table("people", schema) #This is psycopg2
+
+			for test_iteration in range(30):
+				t0 = timeit.default_timer()
+				parser = ing(interface=interface, fname=args['fname'], ftype=delimiter, cols=args['cols'], unit=args['unit'], validation_file=args['vf'], table_name="people")
+				this_n.append(timeit.default_timer()-t0)
+				del parser
+
+			self.timing_dictionary[self.phases[current_phase]].append(this_n)
+
+
+	def test_full_project(self, current_phase: int = -2, structured: bool=True) -> None:
+		##Identifies all parts of the project to be measures and establishes a baseline of 10k rows
+		current_rows = 0
+		for niter in range(len(self.nrows)):
+			this_n = []
+			file_new = self.increase_load(current_rows)
+			current_rows += 1
+			sampler = slurp(filename=f"../util/{file_new}", structured=True)
+			lines = sampler.read_random_lines()
+			schema = inf(lines, delimiter=",", unstructured=False).type_dict
+			interface.create_table("people", schema) #This is psycopg2
+
+			for test_iteration in range(30):
+				t0 = timeit.default_timer()
+				parser = ing(interface=interface, fname=args['fname'], ftype=delimiter, cols=args['cols'], unit=args['unit'], validation_file=args['vf'], table_name="people")
 				this_n.append(timeit.default_timer()-t0)
 
 			self.timing_dictionary[self.phases[current_phase]].append(this_n)
@@ -142,6 +188,7 @@ class Timing_Tests:
 				t0 = timeit.default_timer()
 				data = pandas.read_csv(f"../util/{file_new}")
 				this_n.append(timeit.default_timer()-t0)
+				del data
 
 			self.timing_dictionary[self.phases[current_phase]].append(this_n)
 
