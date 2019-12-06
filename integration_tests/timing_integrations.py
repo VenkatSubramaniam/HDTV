@@ -156,11 +156,11 @@ class Timing_Tests:
 			sampler = slurp(filename=f"../util/{file_new}", structured=True)
 			lines = sampler.read_random_lines()
 			schema = inf(lines, delimiter=",", unstructured=False).type_dict
-			interface.create_table(f"people_{current_rows}", schema) #This is psycopg2
+			interface.create_table(f"people_{current_rows}_{niter}", schema) #This is psycopg2
 
 			for test_iteration in range(30):
 				t0 = timeit.default_timer()
-				parser = ing(interface=interface, fname=f"../util/{file_new}", table_name=f"people_{current_rows}")
+				parser = ing(interface=interface, fname=f"../util/{file_new}", table_name=f"people_{current_rows}_{niter}")
 				this_n.append(timeit.default_timer()-t0)
 				del parser
 			self.timing_dictionary[self.phases[current_phase]].append(this_n)
@@ -182,8 +182,8 @@ class Timing_Tests:
 				sampler = slurp(filename=f"../util/{file_new}", structured=True)
 				lines = sampler.read_random_lines()
 				schema = inf(lines, delimiter=",", unstructured=False).type_dict
-				interface.create_table(f"people__full_{current_rows}", schema) #This is psycopg2
-				parser = ing(interface=interface, fname=f"../util/{file_new}", table_name=f"people__full_{current_rows}")
+				interface.create_table(f"people_{niter}_{current_rows}", schema) #This is psycopg2
+				parser = ing(interface=interface, fname=f"../util/{file_new}", table_name=f"people_{niter}_{current_rows}")
 				this_n.append(timeit.default_timer()-t0)
 				del interface, delimit, delimiter, unstructured, sampler, lines, schema, parser
 
