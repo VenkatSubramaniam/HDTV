@@ -5,19 +5,18 @@
 
 
 import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
 
-def phase_time(runtime, filetype):
-    # get the list of phase and the corresponding time
-    phase = runtime.keys()
-    time = [runtime[key] for key in phase]
-    
-    # plot in a graph
-    plt.figure()
-    plt.plot(phase, time)
-    plt.xlabel('Different phases')
-    plt.ylabel('Runtime(s)')
-    plt.title('Runtime versus each phases when parsing'+filetype)
-
-def size_time(runtime, num_rows, filetype):
-    pass
+def plot_time(runtime, row_number):
+    sns.set()
+    for phase, time in runtime.items():
+        dir = {phase:time, 'rows':row_number}
+        df = pd.DataFrame(data = dir)
+        # plot each phase versus number of rows 
+        sns.lineplot(x='rows', y= phase, data=df)
+        plt.xlabel('Number of rows')
+        plt.ylabel('Runtime(s)')
+        plt.title('Runtime versus Filesize on'+ phase)
+    plt.show()
 
