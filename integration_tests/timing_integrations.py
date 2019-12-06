@@ -37,8 +37,8 @@ class Timing_Tests:
 
 		##Execute
 		self.test_sampler()
-		self.test_estimate_lines()
-		self.test_sampling_lines_1()
+		# self.test_estimate_lines()
+		# self.test_sampling_lines_1()
 		# self.test_sampling_lines_2()
 		# self.test_schema_inferer()
 		# self.test_database_insertion()
