@@ -150,20 +150,19 @@ class Timing_Tests:
 			this_n = []
 			file_new = self.increase_load(current_rows)
 			current_rows += 1
-			interface = dbi(uname=args['uname'], pword=args['pword'], db=args['db'], port=args['port'])
-			delimit = tp(fname=args['fname'])
+			interface = dbi(uname="postgres", pword="password", db="test", port=5432)
+			delimit = tp(fname=f"../util/{file_new}")
 			delimiter, unstructured = delimit.get_delimiter()
 			sampler = slurp(filename=f"../util/{file_new}", structured=True)
 			lines = sampler.read_random_lines()
 			schema = inf(lines, delimiter=",", unstructured=False).type_dict
-			interface.create_table("people", schema) #This is psycopg2
-			
+			interface.create_table(f"people_{current_rows}", schema) #This is psycopg2
+
 			for test_iteration in range(30):
 				t0 = timeit.default_timer()
-				parser = ing(interface=interface, fname=args['fname'], ftype=delimiter, cols=args['cols'], unit=args['unit'], validation_file=args['vf'], table_name="people")
+				parser = ing(interface=interface, fname=f"../util/{file_new}", table_name=f"people_{current_rows}")
 				this_n.append(timeit.default_timer()-t0)
 				del parser
-
 			self.timing_dictionary[self.phases[current_phase]].append(this_n)
 
 
@@ -177,14 +176,14 @@ class Timing_Tests:
 
 			for test_iteration in range(30):
 				t0 = timeit.default_timer()
-				interface = dbi(uname=args['uname'], pword=args['pword'], db=args['db'], port=args['port'])
-				delimit = tp(fname=args['fname'])
-				delimiter, unstructured = delimit.get_delimiter()				
+				interface = dbi(uname="postgres", pword="password", db="test", port=5432)
+				delimit = tp(fname=f"../util/{file_new}")
+				delimiter, unstructured = delimit.get_delimiter()
 				sampler = slurp(filename=f"../util/{file_new}", structured=True)
 				lines = sampler.read_random_lines()
 				schema = inf(lines, delimiter=",", unstructured=False).type_dict
-				interface.create_table("people", schema) #This is psycopg2
-				parser = ing(interface=interface, fname=args['fname'], ftype=delimiter, cols=args['cols'], unit=args['unit'], validation_file=args['vf'], table_name="people")
+				interface.create_table(f"people__full_{current_rows}", schema) #This is psycopg2
+				parser = ing(interface=interface, fname=f"../util/{file_new}", table_name=f"people__full_{current_rows}")
 				this_n.append(timeit.default_timer()-t0)
 				del interface, delimit, delimiter, unstructured, sampler, lines, schema, parser
 
