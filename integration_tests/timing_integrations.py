@@ -26,8 +26,7 @@ class Timing_Tests:
 	Should pass a dictionary of //'phase of project': time// to the graphing function
 	"""
 	def __init__(self):
-		self.phases = ["Sampler"]
-		# , "Estimate Lines", "Sample Lines - Structured v1", "Sample Lines - Structured v2", "Schema Inference", "Parse Structured", "Full Project", "Pandas Baseline"]
+		self.phases = ["Sampler", "Estimate Lines", "Sample Lines - Structured v1", "Sample Lines - Structured v2", "Schema Inference", "Parse Structured", "Full Project", "Pandas Baseline"]
 		# \
 		# "Sample Lines - XML", "Sample Lines - JSON", , "Parse File",\
 		# , "Parse XML", "Parse JSON", ]
@@ -37,13 +36,21 @@ class Timing_Tests:
 
 		##Execute
 		self.test_sampler() 
+		print("finished phase")
 		# self.test_estimate_lines()
+		print("finished phase")
 		# self.test_sampling_lines_1()
+		print("finished phase")
 		# self.test_sampling_lines_2()
+		print("finished phase")
 		# self.test_schema_inferer()
+		print("Starting parser...")
 		# self.test_parser()
+		print("Starting full project...")
 		# self.test_full_project()
+		print("Starting pandas baseline...")
 		# self.test_pandas_baseline()
+		print("End")
 
 	
 	#Phase -> n = 1, ..., n -> For each n, errs on n.
@@ -143,11 +150,14 @@ class Timing_Tests:
 			this_n = []
 			file_new = self.increase_load(current_rows)
 			current_rows += 1
+			interface = dbi(uname=args['uname'], pword=args['pword'], db=args['db'], port=args['port'])
+			delimit = tp(fname=args['fname'])
+			delimiter, unstructured = delimit.get_delimiter()
 			sampler = slurp(filename=f"../util/{file_new}", structured=True)
 			lines = sampler.read_random_lines()
 			schema = inf(lines, delimiter=",", unstructured=False).type_dict
 			interface.create_table("people", schema) #This is psycopg2
-
+			
 			for test_iteration in range(30):
 				t0 = timeit.default_timer()
 				parser = ing(interface=interface, fname=args['fname'], ftype=delimiter, cols=args['cols'], unit=args['unit'], validation_file=args['vf'], table_name="people")
@@ -164,15 +174,19 @@ class Timing_Tests:
 			this_n = []
 			file_new = self.increase_load(current_rows)
 			current_rows += 1
-			sampler = slurp(filename=f"../util/{file_new}", structured=True)
-			lines = sampler.read_random_lines()
-			schema = inf(lines, delimiter=",", unstructured=False).type_dict
-			interface.create_table("people", schema) #This is psycopg2
 
 			for test_iteration in range(30):
 				t0 = timeit.default_timer()
+				interface = dbi(uname=args['uname'], pword=args['pword'], db=args['db'], port=args['port'])
+				delimit = tp(fname=args['fname'])
+				delimiter, unstructured = delimit.get_delimiter()				
+				sampler = slurp(filename=f"../util/{file_new}", structured=True)
+				lines = sampler.read_random_lines()
+				schema = inf(lines, delimiter=",", unstructured=False).type_dict
+				interface.create_table("people", schema) #This is psycopg2
 				parser = ing(interface=interface, fname=args['fname'], ftype=delimiter, cols=args['cols'], unit=args['unit'], validation_file=args['vf'], table_name="people")
 				this_n.append(timeit.default_timer()-t0)
+				del interface, delimit, delimiter, unstructured, sampler, lines, schema, parser
 
 			self.timing_dictionary[self.phases[current_phase]].append(this_n)
 
