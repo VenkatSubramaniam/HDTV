@@ -13,13 +13,14 @@ from typing import Dict
 #Internals
 #from json_parser import jparser
 #from structured_parser import sparser
+from parsers.csv_parser.librarian import Librarian
+from parsers.xml_parser.lumberjack import Lumberjack
 
-from parsers.xml_parser import lumberjack
 
 ## Main ingestion object:
 class Ingester:
     """take file and column labels and insert into postgresql"""
-    def __init__(self, fname: str=None, ftype: str="xml", interface: object=None, cols: str=None, unit: str=None, validation_file: str=None, repeats: Dict={"keys":False}):
+    def __init__(self,  table_name: str, fname: str=None, ftype: str="xml", interface: object=None, cols: str=None, unit: str=None, validation_file: str=None, repeats: Dict={"keys":False}):
 
         self.interface = interface #expects the interface object
         self.filename = fname #expects a path
@@ -29,9 +30,13 @@ class Ingester:
         # self.tree = None
         self.filetype = ftype
         if self.filetype=="lxml":
-            lumberjack = Lumberjack(fname=self.fname, interface=self.interface, cols=self.cols, validation_file=self.validation_file, repeats=self.repeats)
+            lumberjack = Lumberjack(fname=self.filename, interface=self.interface, cols=self.columns, validation_file=self.validation_file, repeats=self.repeats)
             lumberjack.get_tree()
             lumberjack.write_stream(self)
+        if self.filetype==",":
+            librarian =Librarian(fname=self.filename, interface=self.interface, delimiter=ftype, desired_cols=self.columns, table_name=table_name)
+            librarian.parse()
+
         #encoding specification from learner
         #host specification
         

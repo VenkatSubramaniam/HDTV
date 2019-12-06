@@ -41,6 +41,6 @@ class DBInterfacer:
             pass #TODO
         return ", ".join([" ".join(item) for item in schema.items()])
     
-    def insert_row(table:str, row: Dict[str, str]) -> None:
+    def insert_row(self, table:str, row: Dict[str, str]) -> None:
         keys = row.keys()
-        self.cursor.execute(f"insert into {table} {keys} values ({[row[key] for key in keys]})")
+        self.cursor.execute(f"insert into {table} ({', '.join(keys)}) values ({', '.join([row[key] for key in keys])})")
