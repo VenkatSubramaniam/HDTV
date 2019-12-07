@@ -4,6 +4,7 @@
 ##Standard library imports
 import os
 import pandas
+import pickle
 import time
 import timeit
 from typing import Dict, List
@@ -35,19 +36,20 @@ class Timing_Tests:
 		self.timing_dictionary = {key: [] for key in self.phases}
 
 		##Execute
+		print("Starting parser...")
+		self.test_parser()
+		print("Starting full project...")
+		self.test_full_project()
+		print("Fast phases:")
 		self.test_sampler() 
 		print("finished phase")
 		self.test_estimate_lines()
 		print("finished phase")
 		self.test_sampling_lines_1()
-		print("finished phase")
+		print("Starting reservoir")
 		self.test_sampling_lines_2()
 		print("finished phase")
 		self.test_schema_inferer()
-		print("Starting parser...")
-		self.test_parser()
-		print("Starting full project...")
-		self.test_full_project()
 		print("Starting pandas baseline...")
 		self.test_pandas_baseline()
 		print("End")
@@ -156,11 +158,11 @@ class Timing_Tests:
 			sampler = slurp(filename=f"../util/{file_new}", structured=True)
 			lines = sampler.read_random_lines()
 			schema = inf(lines, delimiter=",", unstructured=False).type_dict
-			interface.create_table(f"people_{current_rows}_{niter}", schema) #This is psycopg2
+			interface.create_table(f"any_people_{current_phase+5+niter}_{current_rows}_{niter}", schema) #This is psycopg2
 
 			for test_iteration in range(30):
 				t0 = timeit.default_timer()
-				parser = ing(interface=interface, fname=f"../util/{file_new}", table_name=f"people_{current_rows}_{niter}")
+				parser = ing(interface=interface, fname=f"../util/{file_new}", table_name=f"any_people_{current_phase+5+niter}_{current_rows}_{niter}")
 				this_n.append(timeit.default_timer()-t0)
 				del parser
 			self.timing_dictionary[self.phases[current_phase]].append(this_n)
@@ -182,8 +184,8 @@ class Timing_Tests:
 				sampler = slurp(filename=f"../util/{file_new}", structured=True)
 				lines = sampler.read_random_lines()
 				schema = inf(lines, delimiter=",", unstructured=False).type_dict
-				interface.create_table(f"people_{niter}_{current_rows}", schema) #This is psycopg2
-				parser = ing(interface=interface, fname=f"../util/{file_new}", table_name=f"people_{niter}_{current_rows}")
+				interface.create_table(f"free_people_{current_phase+5+test_iteration}_{test_iteration}_{current_rows}", schema) #This is psycopg2
+				parser = ing(interface=interface, fname=f"../util/{file_new}", table_name=f"free_people_{current_phase+5+test_iteration}_{test_iteration}_{current_rows}")
 				this_n.append(timeit.default_timer()-t0)
 				del interface, delimit, delimiter, unstructured, sampler, lines, schema, parser
 
@@ -220,4 +222,6 @@ class Timing_Tests:
 
 if __name__ == "__main__":
 	graphs = Timing_Tests()
+	with open('../util/timing_graphs.pickle', 'wb') as handle:
+		pickle.dump(graphs.timing_dictionary,handle,protocol=pickle.HIGHEST_PROTOCOL)
 	pt.plot_time(graphs.timing_dictionary, graphs.nrows)	
