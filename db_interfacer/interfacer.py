@@ -2,7 +2,7 @@
 # coding: utf-8
 
 from typing import Dict
-import psycopg2 as pg # kill me this name
+import psycopg2 as pg
 
 
 class DBInterfacer:
@@ -16,7 +16,7 @@ class DBInterfacer:
             connection = pg.connect(user=uname, password=pword, port=port, database=db)  # do we have to create this before? The db, I mean.
             return connection, connection.cursor()
         except (Exception, psycopg2.Error) as error:
-            raise Exception("We were unsuccessful in connecting to postgres. Are you sure you set up your database as requested?")  # think this works? We shall see.
+            raise Exception("We were unsuccessful in connecting to postgres. Are you sure you set up your database as requested?")
 
     def commit(self) -> None:
         self.connection.commit()
@@ -40,7 +40,16 @@ class DBInterfacer:
         if key:
             pass #TODO
         return ", ".join([" ".join(item) for item in schema.items()])
+
+    def stringify(self, table:str, row: Dict[str, str], keys: object) -> None:
+        stringify = ["'"+row[key]+"'" for key in keys]
+        query = f"insert into {table} ({', '.join(keys)}) values ({', '.join(stringify)})"
+        self.cursor.execute(query)
     
     def insert_row(self, table:str, row: Dict[str, str]) -> None:
         keys = row.keys()
         self.cursor.execute(f"insert into {table} ({', '.join(keys)}) values ({', '.join([row[key] for key in keys])})")
+        # try:
+        #     self.cursor.execute(f"insert into {table} ({', '.join(keys)}) values ({', '.join([row[key] for key in keys])})")
+        # except:
+        #     self.stringify(table, row, keys)
